@@ -1,0 +1,32 @@
+# Package manifest
+
+- `.gitignore`
+- `CITATION.cff`
+- `LICENSE`
+- `README.md`
+- `START_HERE.md`
+- `docs/01_system_overview.md`
+- `docs/02_nonlinear_model.md`
+- `docs/03_state_space_model.md`
+- `docs/04_pid_controller.md`
+- `docs/05_lqr_controller.md`
+- `docs/06_simulation_results.md`
+- `docs/07_experimental_results.md`
+- `docs/08_results_and_limitations.md`
+- `docs/09_reproduction_guide.md`
+- `docs/10_source_review_notes.md`
+- `docs/11_traceability.md`
+- `firmware/README.md`
+- `hardware/README.md`
+- `matlab/README.md`
+- `paper/TRMS_Final_Paper_Senturk_Acar_Deri.pdf`
+- `results/FIGURE_ATTRIBUTION.md`
+- `results/RESULTS.md`
+- `results/figures/lqr_hardware_response.png`
+- `results/figures/lqr_simulation_step.png`
+- `results/figures/lqr_simulink.png`
+- `results/figures/pid_hardware_response.png`
+- `results/figures/pid_simulation_step.png`
+- `results/figures/pid_simulink.png`
+- `results/figures/system_identification_figure.png`
+- `results/figures/trms_setup.png`

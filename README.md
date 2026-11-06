@@ -1,201 +1,117 @@
-# Twin Rotor MIMO System — PID and LQR Control
+# Twin Rotor MIMO System — PID vs. LQR Control
 
-**Modeling, Simulation, and Real-Time Implementation of Classical and Optimal Control Strategies**
+**Mathematical modeling · MATLAB/Simulink simulation · Real-time experimental evaluation**
 
-A comparative study of **Proportional–Integral–Derivative (PID)** and **Linear Quadratic Regulator (LQR)** control strategies for a Twin Rotor Multi-Input Multi-Output System (TRMS), combining mathematical modeling, MATLAB/Simulink simulation, and experimental implementation on physical hardware.
+This repository documents a comparative study of **PID** and **Linear Quadratic Regulator (LQR)** control for a two-degree-of-freedom **Twin Rotor MIMO System (TRMS)**. The project combines nonlinear dynamic modeling, a seventh-order linear state-space representation, controller tuning, simulation, and tests on a physical TRMS platform.
 
-## Project Overview
+> **Research scope:** The published comparison primarily evaluates **pitch-axis stabilization**. Both controllers were tested in simulation and on physical hardware. This repository does **not** claim that other control methods (e.g., SMC or H∞) were experimentally evaluated in this paper.
 
-The Twin Rotor MIMO System is a nonlinear, coupled, two-degree-of-freedom laboratory platform used to investigate control challenges associated with helicopter-like dynamics.
+![TRMS experimental platform](results/figures/trms_setup.png)
 
-The system consists of two independently driven DC motors:
+*Figure 1 from the research paper; original figure credited there to reference [2].*
 
-- **Main rotor:** Generates thrust to control vertical motion (pitch).
-- **Tail rotor:** Generates thrust to control horizontal motion (yaw).
+## What is included
 
-Its dynamics involve aerodynamic nonlinearities, gravitational effects, friction, and cross-coupling between the two rotational axes.
+This is a **documentation and figure archive**, not a runnable MATLAB/Simulink release. The paper and its eight reproduced figures are included; original `.m`, `.slx`, embedded firmware, and raw experimental datasets have **not** been supplied. See [Reproduction guide](docs/09_reproduction_guide.md) for what is needed to rerun the work.
 
-This project investigates the performance of classical PID control and state-space-based LQR control under simulated and real operating conditions.
+## Highlights
 
-## Research Objectives
+- Nonlinear pitch/yaw dynamics with gravity, friction, aerodynamic torque, and coupling.
+- Seventh-order state-space model used for LQR design, **adopted from manufacturer documentation**, not directly identified from this apparatus.
+- Classical PID benchmark compared with state-feedback LQR.
+- MATLAB/Simulink modeling and physical experiments.
+- Quantitative comparison of rise time, settling time, overshoot, and steady-state error.
+- Analysis of the substantial simulation-to-hardware mismatch for LQR.
 
-1. Develop a mathematical representation of the TRMS dynamics.
-2. Investigate a linearized state-space model suitable for optimal control design.
-3. Design and tune PID and LQR controllers.
-4. Evaluate both controllers in MATLAB/Simulink.
-5. Implement the controllers on the physical TRMS.
-6. Compare simulation and experimental performance using time-domain response metrics.
-7. Identify the effects of model uncertainty and unmodeled physical dynamics.
+## Experimental results
 
-## System Description
-
-| Property | Description |
-|---|---|
-| Platform | Twin Rotor MIMO System |
-| Degrees of freedom | 2 |
-| Controlled variables | Pitch and yaw angles |
-| Actuators | Two DC motors |
-| Control strategies | PID and LQR |
-| Simulation environment | MATLAB/Simulink |
-| Experimental validation | Physical TRMS setup |
-| Primary experimental focus | Pitch-axis tracking and stabilization |
-
-## Mathematical Modeling
-
-The nonlinear TRMS model is developed using Newton–Euler formulations, incorporating aerodynamic thrust, gravitational moments, friction, and coupling effects.
-
-The pitch dynamics are represented by:
-
-\[
-J_v\ddot{\alpha}_v =
-\tau_v-\tau_{vg}-\tau_{vf}-\tau_{v,coup}
-\]
-
-The yaw dynamics are represented by:
-
-\[
-J_h\ddot{\alpha}_h =
-\tau_h-\tau_{hf}-\tau_{h,coup}
-\]
-
-For LQR design, a linear state-space representation is considered:
-
-\[
-\dot{x}=Ax+Bu
-\]
-
-\[
-y=Cx+Du
-\]
-
-The final controller design uses a seventh-order state-space model based on manufacturer-provided system parameters. Direct experimental identification of this model was not performed as part of the reported study.
-
-## Controller Design
-
-### 1. PID Control
-
-A decentralized PID control approach is considered for regulating the TRMS axes.
-
-The classical PID control law is:
-
-\[
-u(t)=K_pe(t)+K_i\int_0^t e(\tau)d\tau+
-K_d\frac{de(t)}{dt}
-\]
-
-The final tuned parameters reported in the paper are:
-
-| Parameter | Value |
-|---|---:|
-| \(K_p\) | 0 |
-| \(K_i\) | 0.9 |
-| \(K_d\) | 0.2 |
-
-The PID controller provides a practical baseline with relatively limited dependence on a detailed plant model.
-
-### 2. Linear Quadratic Regulator (LQR)
-
-LQR is a model-based state-feedback controller designed to minimize the quadratic cost function:
-
-\[
-J=\int_0^\infty(x^TQx+u^TRu)\,dt
-\]
-
-The control law is:
-
-\[
-u=-Kx
-\]
-
-The weighting matrices are selected to balance state regulation and control effort.
-
-The paper reports the following feedback gain:
-
-\[
-K=
-\begin{bmatrix}
--1.777 & 1.000 & 1.018 & 0.219 &
-1.323 & 0.703 & 6.427
-\end{bmatrix}
-\]
-
-This gain is reported for the seventh-order model used in the study.
-
-## Results and Performance Comparison
-
-### Simulation Results
-
-| Performance metric | PID | LQR |
-|---|---:|---:|
-| Rise time | 4.950 s | 16.306 s |
-| Settling time | 7.754 s | >30 s |
-| Peak time | 11.820 s | 30.000 s |
-| Overshoot | 1.15% | 0% |
-| Steady-state error | 0.0002 | 0.0101 |
-
-In simulation, PID demonstrated faster tracking and settling, while LQR exhibited a more heavily damped response without overshoot.
-
-### Real-Time Experimental Results
-
-| Performance metric | PID | LQR |
-|---|---:|---:|
+| Metric | PID (physical system) | LQR (physical system) |
+|:--|--:|--:|
 | Rise time | 2.84 s | 0.065 s |
-| Settling time | 19.40 s | >30 s |
+| Settling time | 19.40 s | > 30 s (not settled) |
 | Overshoot | 0.7% | 38.50% |
 | Steady-state error | 0.0272 | 0.0202 |
 
-The experimental results reveal substantial differences between simulated and physical behavior.
+The LQR configuration had a faster initial rise but substantial oscillation and overshoot; PID achieved low overshoot and settled within the reported observation window. These numbers are **reported in Table IV of the paper**, not independently recomputed from raw data.
 
-**PID** produced a slower initial response than LQR but maintained low overshoot and reached the reported settling criterion.
+| PID hardware response | LQR hardware response |
+|:--:|:--:|
+| ![PID physical response](results/figures/pid_hardware_response.png) | ![LQR physical response](results/figures/lqr_hardware_response.png) |
 
-**LQR** produced an extremely fast initial response but exhibited significant overshoot and sustained oscillations, preventing settling within the experimental observation window.
+## Modeling and controllers
 
-These results highlight the importance of accurate plant modeling, actuator dynamics, and experimental validation when implementing optimal controllers.
+The nonlinear pitch-axis equation is
 
-## Key Findings
+$$J_v\ddot{\alpha}_v=\tau_v-\tau_{vg}-\tau_{vf}-\tau_{v,\mathrm{coup}}$$
 
-- Classical PID provided more consistent stabilization performance on the physical system.
-- LQR demonstrated significantly faster experimental rise time, but with reduced damping.
-- The seventh-order model did not fully predict the physical system's closed-loop response.
-- Motor dead zones, actuator delays, aerodynamic effects, and other unmodeled dynamics were identified as possible contributors to the simulation-to-hardware discrepancy.
-- Experimental validation was essential for evaluating controller performance beyond idealized simulations.
+and the yaw-axis equation is
 
-## Limitations
+$$J_h\ddot{\alpha}_h=\tau_h-\tau_{hf}-\tau_{h,\mathrm{coup}}.$$
 
-The study has several important limitations:
+For LQR design, the study uses $\dot{x}=Ax+Bu$ and $u=-Kx$, with a seven-state model and reported feedback gain
 
-- The seventh-order model was adopted from manufacturer documentation rather than directly identified on the experimental apparatus.
-- The primary quantitative experimental comparison focuses on pitch-axis tracking.
-- The reported LQR response did not settle within the 30-second observation window.
-- Quantitative energy-consumption measurements were not provided.
-- The effects of cross-axis coupling were discussed, but a complete numerical coupling-rejection comparison was not presented.
-- Performance conclusions are specific to the reported models, controller gains, operating conditions, and hardware configuration.
+$$K=[-1.777,\ 1.000,\ 1.018,\ 0.219,\ 1.323,\ 0.703,\ 6.427].$$
 
-## Future Work
+The paper's final reported PID gains are $K_p=0$, $K_i=0.9$, $K_d=0.2$. See the documentation for the model assumptions, controller parameters, and interpretation caveats.
 
-Potential extensions include:
+## Documentation
 
-- Experimental system identification and model validation.
-- Integral LQR (LQI) for improved steady-state tracking.
-- Improved actuator saturation and dead-zone modeling.
-- Robust and adaptive control strategies.
-- Expanded pitch–yaw coupling experiments.
-- Quantitative control-effort and energy measurements.
+| Document | Contents |
+|:--|:--|
+| [System overview](docs/01_system_overview.md) | TRMS structure, research objectives, physical parameters |
+| [Nonlinear modeling](docs/02_nonlinear_model.md) | Pitch/yaw equations, torque components, assumptions |
+| [State-space model](docs/03_state_space_model.md) | Seventh-order matrices, provenance, dimensional notes |
+| [PID controller](docs/04_pid_controller.md) | Control law, tuning, simulation and hardware response |
+| [LQR controller](docs/05_lqr_controller.md) | Cost function, weights, gain, hardware mismatch |
+| [Simulation results](docs/06_simulation_results.md) | Simulink figures and Table III |
+| [Experimental results](docs/07_experimental_results.md) | Hardware plots and Table IV |
+| [Results and limitations](docs/08_results_and_limitations.md) | Comparative discussion, evidence boundaries |
+| [Reproduction guide](docs/09_reproduction_guide.md) | Requirements and missing artifacts |
+| [Source review](docs/10_source_review_notes.md) | Open issues to verify before code release |
+| [Source traceability](docs/11_traceability.md) | Page-by-page evidence map |
+| [Results gallery](results/RESULTS.md) | All eight figures from the paper |
 
-## Research Paper
+## Repository structure
 
-**Comparative Analysis of Classical PID and Optimal LQR Control Strategies for a Twin Rotor MIMO System: Simulation and Real-Time Implementation**
+```text
+TRMS-PID-LQR-Control/
+├── README.md
+├── LICENSE
+├── CITATION.cff
+├── docs/
+│   ├── 01_system_overview.md
+│   ├── 02_nonlinear_model.md
+│   ├── 03_state_space_model.md
+│   ├── 04_pid_controller.md
+│   ├── 05_lqr_controller.md
+│   ├── 06_simulation_results.md
+│   ├── 07_experimental_results.md
+│   ├── 08_results_and_limitations.md
+│   ├── 09_reproduction_guide.md
+│   └── 10_source_review_notes.md
+├── results/
+│   ├── RESULTS.md
+│   └── figures/              # 8 figures extracted from the paper
+├── paper/
+│   └── TRMS_Final_Paper_Senturk_Acar_Deri.pdf
+├── matlab/                  # source code pending review
+├── firmware/                # source code pending review
+└── hardware/                # wiring/parts evidence pending review
+```
 
-**Authors:** Yusuf Selim Şentürk, Ömer Hamza Acar, Mustafa Deri
+## Technical verification notes
 
-**Affiliation:** Department of Electrical and Electronics Engineering, İzmir Kâtip Çelebi University, Türkiye.
+The paper presents a seventh-order model with a **two-column input matrix** but reports a **scalar input penalty** and a **single-row LQR gain**. Those representations require reconciliation against the original MATLAB implementation before a working multi-input controller can be reconstructed. Reported experimental metrics are transcribed from the manuscript, not recalculated from measurements.
 
-This repository is based on the six-page research paper and its reported simulation and experimental results.
+## Authors and attribution
 
-## Repository Status
+**Yusuf Selim Şentürk · Ömer Hamza Acar · Mustafa Deri**  
+Department of Electrical and Electronics Engineering, İzmir Kâtip Çelebi University, Türkiye.
 
-Technical documentation is being organized. MATLAB/Simulink models, experimental data, and embedded source files will be added after review and verification.
+Research paper: *Comparative Analysis of Classical PID and Optimal LQR Control Strategies for a Twin Rotor MIMO System: Simulation and Real-Time Implementation* ([PDF](paper/TRMS_Final_Paper_Senturk_Acar_Deri.pdf)). Publication venue and DOI are **not specified** in the supplied manuscript.
 
-## Keywords
+**Figure provenance:** The eight images in `results/figures/` were extracted from the supplied paper. Figure 1 credits a third-party source in the manuscript. The images are provided as research-paper excerpts, not as independently licensed original image assets; review reuse permissions before public distribution.
 
-`TRMS` · `PID` · `LQR` · `MATLAB` · `Simulink` · `Control Systems` · `State-Space Modeling` · `Real-Time Control` · `Robotics` · `Experimental Validation`
+## Status
+
+**Documentation package complete; reproducible source package not yet available.** No MATLAB/Simulink project files, firmware, raw data, or verified hardware schematics were supplied with this paper. These directories are placeholders and do not imply that their implementations are included.
